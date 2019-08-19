@@ -32,39 +32,4 @@ We will be looking for the following things:
 
 ---
 
-## Requirements
 
-- Materials must be in a clearly commented Jupyter notebook
-- You should demonstrate the ability to:
-
-    - Analyze a complex dataset & explicitly state your assumptions.
-    - Clean, impute, and explore the dataset.
-    - Justify your modeling choices and feature engineering.
-    - Plot, visualize, and interpret your data logically.
-    - Clearly outline your modeling strategy in response to the questions
-    - Explain your results to a technical audience.
-
----
-
-### Project Feedback + Evaluation
-
-For all projects, students will be evaluated on a simple 4 point scale (0, 1, 2 or 3). Instructors will use this rubric when scoring student performance on each of the core project **requirements:** 
-
- Score | Expectations
- ----- | ------------
- **0** | _Did not complete. Try again._
- **1** | _Does not meet expectations. Try again_
- **2** | _Meets expectations._
- **3** | _Surpasses expectations. Brilliant!_
- 
-| Requirement | Rubric   |
-|------|------|
-|   Materials must be in a clearly commented Jupyter notebook  | |
-|   Analyse a complex dataset & explicitly state your assumptions  | |
-|   Clean, impute, and explore the dataset  | |
-|   Justify your modeling choices and feature engineering  | |
-| Plot, visualize, and interpret your data logically ||
-| Clearly outline your modeling strategy in response to the questions ||
-| Explain your results to a technical audience ||
-
-__Qualitative feedback:__
