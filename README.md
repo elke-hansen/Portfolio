@@ -9,7 +9,7 @@ For each project there is atleast one jupyter notebook containing all the code, 
 * Project 1 : Pokemon Stay; python & function creation
 * Project 2 : SAT and drug dataset; EDA and visualisation
 * Project 3 : Ames Housing; House Price Prediction Using Regression Models
-* Project 4 : Web Scraping Seek; NLP and Ensemble Modelling - WIP
+* Project 4 : Web Scraping Seek; NLP and Ensemble Modelling
 * Capstone : Retail Sales; Clustering and Recommendation Engines - WIP
 
 Skills Showcased: Python | SQL | Machine Learning | Web Scraping | Regex | Pandas | NumPy | Linear & Logistic Regression modeling | Random Forests | NLP | Clustering |
