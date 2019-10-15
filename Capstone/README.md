@@ -30,7 +30,7 @@ From this, I had several ideas for models that can be created from a good custom
  This is the main notebook where I tested and trained different models to decide on aspects of the data that can be predicted to inform good recommendations.
 
 #### Final Model:
- Notebook containing the bare minimum pieces of code to get recommendations.
+ Notebook containing the final model with the bare minimum pieces of code to get recommendations as well as some additional code for trial and error to create the flask app and flourish visualisation.
 
 
 ## Current Progress
@@ -54,49 +54,36 @@ From this, I had several ideas for models that can be created from a good custom
 #### Modelling
 
   For the modelling aspect of this project I took a few approaches to see what kind of information I could predict to varying accuracy.
+
+  1. Basic recommendation engine
+  2. Review Score Target
+  3. On Time Status Target
+  4. Customer segmentation using clustering
+  5. Customer segmentation using SVD and TFIDF
+  6. Customer-Customer Collaborative Filtering
+  7. Item-Item Collaborative Filtering
+
+ For more information about the processes regarding the first 6 modelling trials, please refer to the Model Trial and Error notebook.
+
+ #### Item-Item Collaborative Filtering
+
+  After initially starting this project thinking that the customer based collaborative filtering model was the way to go, I slowly realised that an item-item filtering would be better for the following reasons:
+
+  1. The number of products a company has is finite while the number of customers is potentially infinite.
+  2. If I visualise the products connected to each other, you can see clustering when it comes to category and other product attributes.
+  3. Most importantly, this particular dataset has 91,000 unique customers and only 31,000 unique products. This means:
+    - more connections between the products as they have more frequency of purchase
+    - 30 times shorter calculation time for the full product set (64 days versus 1,895)
+    - smaller file size for storage
   
-###### Basic Recommendation Engine
+  The model works by calculating the cosine similarities between each product and then recommending based on the customers prior purchases and their most similar products
 
-  This model is the very bare bones of a recommendation engine. It takes the list of products that a customer has purchased and compares it to all the other customers and what they have purchased to be able to make a suggestion based on collaborative filtering. The model uses a weighted jaccard score which takes the similar items beteen customers but also weights the items by how popular they are. This way you won't just get recommendations of the most popular items each time. It then takes the score between the key customer and finds the weights between that customer and all other customers, sorts from highest to lowest and returns the items those other customers have purchased that the key customer has not. 
+#### Flask Application 
+  In order to show the working model, I created a flask application which combines a Flourish representation of the item-item network (note, it only includes the top ~ 400 products for ease of understanding) and the ability to select hypothetically purchased items and get the top 5 recommendations for whichever combination is selected along with their images. I am currently in the process of turning this into a web hosted application so please watch this space.
   
-  This model would work quite well for a large set of customers that have made several purchases each. However, my dataset has 80% of the customers only purchased once so most of the customers were only being recommended one item, or in some cases none, so I needed to find something a bit more extensive. This is actually a positive for the project as a whole as it gives me an opportunity to explore solutions to the cold start problem. That is, what do you recommend to new customers that you have little to no information about? 
-
-
-
- *From the initial base recommendation engine, I decided to take a look at some other types of models to see what else I could predict and whether or not these could be included in the model. After the initial EDA, I had noticed that the review score was affected by whether or not an order was delivered on time but not so much affected by the actual delivery time which leads me to believe that the review score is highly based on product given that the order is delivered on time. As such, I wanted to model these two features.* 
-
-  
-###### Review Score Prediction
-
- For this model I decided to start with regression models to see what kind of results I could get. The idea being that if I can predict review score in a linear fashion then I could rank products based on their score and be able to recommend in that manner. However, after trialling a few different methods including linear regression, random forest and lasso with cross validation, the best accuracy score these models could manage was 26.8% so I quickly decided to move on to classification models.
- 
- For classification, I used both logistic regression and random forest and trialled some other models such as an SGD classifier but found the best model to be the random forest combined with a truncated SVD for feature reduction. This model had an f-1 score of 64% compared to the baseline of 57.3% and while this is not a huge lift, it has significantly improved the accuracy of predicting the extreme scored of 1 and 5. After plotting the number of SVD components against the explained variance ratio, I found the optimal components to be 115, which covers ~92% of the variance while significantly decreasing the features, preventing overfitting. It also gave me an extra point on my f-1 score increasing it to 65%.
-
-###### On Time Status Target
-
-For this model I had extremely unbalanced classes so the baseline model was already giving 92%. After trialling some different models, I found the best one to be the same model used for review score, a random forest with truncated SVD and the same amount of optimal components. This gives an average f-1 score of 96%. The main thing I like about this model is that it improved the 0 classification (an order is delivered late compared to provided expected delivery time) from 8% to 69% which is really good as we do not want to recommend items that are likely to be late.
-
-###### Clustering: Customer Segmentation
-
-Next I wanted to see if I could use an SVD to reduce the features in order to cluster the customers to recommend purchases based on customers like them. In this case, I was unable to find any well performing clusters so I quickly moved on.
-
-
-###### Collaborative Filtering Using SVD and TFIDF
-
-After trialling different models and seeing that SVD has worked well on this data, I decided to try and use this technique for a more in depth collaborative filtering model. By using a tfidf vectorizer to count all products purchased in a matrix against all customers, I was able to replicate the weights penalizing the popular products that I had used in my basic model. This time I have all the information in a matrix that can be plugged in to an SVD. After retrieving the most important 1000 components in this SVD, I can take a csoine similarity between any two customers to see how likely they are to order the same items. In this case,it's not as important to calculate the optimal number of components as I am essentially just using it in order to rank each customer in reference to another.
-
-
-###### Intermediate Recommendation Engine
-
-Now that I have the method by which to calculate the similarities between each customer, I need to go about the task of actually doing so. For each customer, to calculate all other customers and their cosine simlarity it takes around half an hour. This means that in order to get a starting database of all customers, it will take 127 days as I have 80,000+ unique customers in the database. In order to be able to only have to do this task once, the best method is to create a clustered dictionary with each customer as the key and then the value be a dictionary of the similarities with all other customers. This way when a new customer purchases something, it would only need that half hour calculation and a further calculation to insert into all other customers' dictionaries. Up until this point, this new customers recommendations will be made using other metrics such as most popular items for their demographic etc. It also means this calculation does not need to be done on the spot as recommendations need to be made instantaneously. This initial processing time and general data storage capacity is one of the biggest factors to take into consideration when creating a recommendation such as this.
-
-Once you have this dictionary per customer of their similarities to other customers, the model is really simple. It sorts the dictionary to find the most similar customers and then recommends based on which items those similar customers have bought which the key customer has not yet purchased.
-
 
 
 #### Next Steps:
 * Combination of models and increased complexity. Take the SVD components that predict review score and use those to make recommendations. Or use it to exclude low review predicted products
 * Strategy for how to track and incorporate (hypothetical) future sales and implementation of recommending to brand new customers
-* Use of SQL queries to emulate a real business data structure
-* Creation of a working flask application for predictions
 
